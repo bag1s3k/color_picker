@@ -1,0 +1,33 @@
+Horizontal {
+    width: 1fr;
+    align: center middle;
+    padding: 0 1;
+    height: auto;
+}
+
+Horizontal > #container-static {
+    border: round $primary;
+}
+
+Horizontal > #container-static > Static {
+    background: white; # TODO: temporarily hardcoded
+    height: 1fr;
+}
+
+Horizontal > #container-radioset {
+    border: round $primary;
+    height: 1fr;
+    width: 1fr;
+    padding: 0 1;
+    align: center middle;
+}
+
+Horizontal > #container-radioset > RadioSet {
+    layout: horizontal;
+    border: none;
+    background: transparent;
+}
+
+Horizontal > #container-radioset > RadioSet > RadioButton {
+    border: round $panel-lighten-2;
+}
