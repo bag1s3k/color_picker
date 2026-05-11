@@ -23,11 +23,12 @@ class ColorPicker(App[None]):
         with Horizontal(id="choose-color-space"):
             with Container(id="container-static"):
                 yield Static()
-            
-            with Container(id="container-radioset"):
-                with RadioSet():
-                    for color_space in COLOR_SPACES.keys():
-                        yield RadioButton(color_space, value=True)
+
+            radio_set = RadioSet()
+            radio_set.border_subtitle = "Color Spaces"
+            with radio_set:
+                for color_space in COLOR_SPACES.keys():
+                    yield RadioButton(color_space, value=True)
 
         with Container(id="set-numbers"):
             with Horizontal():
@@ -41,8 +42,8 @@ class ColorPicker(App[None]):
         yield Footer()
     
     def on_mount(self) -> None:
-        self.title = "Header Application"
-        self.sub_title = "Subtitle"
+        self.title = "Color Picker"
+        self.sub_title = "Support five different color spaces"
 
     def on_resize(self, event: Resize) -> None:
         square = self.query_one("Horizontal > #container-static")

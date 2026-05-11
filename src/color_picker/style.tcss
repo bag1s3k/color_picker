@@ -15,21 +15,15 @@
     height: 1fr;
 }
 
-#choose-color-space > #container-radioset {
-    border: round $primary;
+#choose-color-space > RadioSet {
+    layout: horizontal;
+    background: transparent;
     height: 1fr;
-    width: 1fr;
-    padding: 0 1;
+    border: round $primary;
     align: center middle;
 }
 
-#choose-color-space > #container-radioset > RadioSet {
-    layout: horizontal;
-    border: none;
-    background: transparent;
-}
-
-#choose-color-space > #container-radioset > RadioSet > RadioButton {
+#choose-color-space > RadioSet > RadioButton {
     border: round $panel-lighten-2;
 }
 
