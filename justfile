@@ -15,3 +15,6 @@ dev file=main_script:
 
 console:
     uv run textual console
+
+colors:
+    uv run textual run -c textual colors
