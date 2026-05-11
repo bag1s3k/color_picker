@@ -1,8 +1,10 @@
 from textual.app import App, ComposeResult
-from textual.widgets import RadioButton, RadioSet, Static, Footer, Header
+from textual.widgets import RadioButton, RadioSet, Static, Footer, Header, Input
 from textual.containers import Horizontal, Container
 from textual.binding import Binding
 from textual.events import Resize
+
+from color_picker.constants import COLOR_SPACES
 
 
 class ColorPicker(App[None]):
@@ -13,20 +15,28 @@ class ColorPicker(App[None]):
         Binding(key="?", action="help", description="Show help screen", key_display="?")
     ]
 
+    selected_space = "RGB"  # TODO: hardcoded RGB
+
     def compose(self) -> ComposeResult:
         yield Header(icon="☰")
 
-        with Horizontal():
+        with Horizontal(id="choose-color-space"):
             with Container(id="container-static"):
                 yield Static()
             
             with Container(id="container-radioset"):
                 with RadioSet():
-                    yield RadioButton("RGB", value=True)
-                    yield RadioButton("HSV")
-                    yield RadioButton("HSL")
-                    yield RadioButton("HWB")
-                    yield RadioButton("OKLCH")
+                    for color_space in COLOR_SPACES.keys():
+                        yield RadioButton(color_space, value=True)
+
+        with Container(id="set-numbers"):
+            with Horizontal():
+                current_space = COLOR_SPACES[self.selected_space]
+                for i in range(len(current_space["channels"])):
+                    channel = current_space["channels"][i]
+                    max_value = current_space["max"][i]
+                    unit = current_space["unit"][i]
+                    yield Input(placeholder=f"{channel} (0 - {max_value}{unit})")
 
         yield Footer()
     
@@ -42,7 +52,6 @@ class ColorPicker(App[None]):
 
         square.styles.width = term_base_width * 2
         horizontal.styles.height = term_base_width
-
 
         
 if __name__ == "__main__":

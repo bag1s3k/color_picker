@@ -1,20 +1,21 @@
-Horizontal {
+#choose-color-space {
     width: 1fr;
     align: center middle;
     padding: 0 1;
     height: auto;
+    min-height: 5;
 }
 
-Horizontal > #container-static {
+#choose-color-space > #container-static {
     border: round $primary;
 }
 
-Horizontal > #container-static > Static {
+#choose-color-space > #container-static > Static {
     background: white; # TODO: temporarily hardcoded
     height: 1fr;
 }
 
-Horizontal > #container-radioset {
+#choose-color-space > #container-radioset {
     border: round $primary;
     height: 1fr;
     width: 1fr;
@@ -22,12 +23,31 @@ Horizontal > #container-radioset {
     align: center middle;
 }
 
-Horizontal > #container-radioset > RadioSet {
+#choose-color-space > #container-radioset > RadioSet {
     layout: horizontal;
     border: none;
     background: transparent;
 }
 
-Horizontal > #container-radioset > RadioSet > RadioButton {
+#choose-color-space > #container-radioset > RadioSet > RadioButton {
     border: round $panel-lighten-2;
+}
+
+#set-numbers > Horizontal {
+    height: auto;
+    border: round $primary;
+    margin: 0 1;
+}
+
+#set-numbers > Horizontal {
+    height: auto;
+    width: 1fr;
+}
+
+#set-numbers > Horizontal > Input {
+    width: 1fr;
+}
+
+#set-numbers > Horizontal > Input:focus {
+    border: tall $secondary;
 }
