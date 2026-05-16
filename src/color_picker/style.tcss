@@ -1,3 +1,9 @@
+PyfigletText {
+    width: 1fr;
+    text-align: center;
+    color: $primary-lighten-3;
+}
+
 #choose-color-space {
     width: 1fr;
     align: center middle;
@@ -27,21 +33,48 @@
     border: round $panel-lighten-2;
 }
 
-#set-numbers > Horizontal {
+#set-numbers {
     height: auto;
     border: round $primary;
     margin: 0 1;
-}
-
-#set-numbers > Horizontal {
-    height: auto;
     width: 1fr;
 }
 
-#set-numbers > Horizontal > Input {
+#set-numbers > Input {
     width: 1fr;
 }
 
-#set-numbers > Horizontal > Input:focus {
+#set-numbers > Input:focus {
     border: tall $secondary;
+}
+
+#color-spaces {
+    height: 1fr;
+    width: 1fr;
+    align: center middle;
+    min-height: 11;
+}
+
+#color-spaces > Grid {
+    margin: 0 1;
+    grid-size: 2 3;
+    grid-gutter: 0 2;
+    width: 1.8fr;
+    border: round $primary;
+    align: center middle;
+}
+
+#color-spaces > PyfigletText {
+    height: 1fr;
+    border: round $primary;
+    content-align: center middle;
+}
+
+#color-spaces > Grid > Label {
+    border: round $secondary;
+    border-title-color: $primary;
+    padding: 0 2;
+    width: 1fr;
+    min-height: 5;
+    content-align: left middle;
 }

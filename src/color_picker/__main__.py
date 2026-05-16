@@ -1,10 +1,12 @@
 from textual.app import App, ComposeResult
-from textual.widgets import RadioButton, RadioSet, Static, Footer, Header, Input
-from textual.containers import Horizontal, Container
+from textual.widgets import RadioButton, RadioSet, Static, Footer, Header, Input, Label
+from textual.containers import Horizontal, Grid, Container
 from textual.binding import Binding
 from textual.events import Resize
 
 from color_picker.constants import COLOR_SPACES
+from color_picker.widgets import PyfigletText
+from color_picker.help import circle_buffer
 
 
 class ColorPicker(App[None]):
@@ -19,6 +21,8 @@ class ColorPicker(App[None]):
 
     def compose(self) -> ComposeResult:
         yield Header(icon="☰")
+        
+        yield PyfigletText("C o l o r  P i c k e r")
 
         with Horizontal(id="choose-color-space"):
             with Container(id="container-static"):
@@ -30,14 +34,26 @@ class ColorPicker(App[None]):
                 for color_space in COLOR_SPACES.keys():
                     yield RadioButton(color_space, value=True)
 
-        with Container(id="set-numbers"):
-            with Horizontal():
-                current_space = COLOR_SPACES[self.selected_space]
-                for i in range(len(current_space["channels"])):
-                    channel = current_space["channels"][i]
-                    max_value = current_space["max"][i]
-                    unit = current_space["unit"][i]
-                    yield Input(placeholder=f"{channel} (0 - {max_value}{unit})")
+        with Horizontal(id="set-numbers"):
+            current_space = COLOR_SPACES[self.selected_space]
+            for i in range(len(current_space["channels"])):
+                channel = current_space["channels"][i]
+                max_value = current_space["max"][i]
+                unit = current_space["unit"][i]
+
+                yield Input(placeholder=f"{channel} (0 - {max_value}{unit})")
+
+        with Horizontal(id="color-spaces"):
+            with Grid():
+                for color_space, specs in COLOR_SPACES.items():
+                    i = circle_buffer()
+                    unit = specs["unit"]
+
+                    label = Label(f"0{unit[next(i)]} 0{unit[next(i)]} 0{unit[next(i)]}")
+                    label.border_title = color_space
+                    yield label
+
+            yield PyfigletText("#ffffff")
 
         yield Footer()
     
