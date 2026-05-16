@@ -1,12 +1,14 @@
+from textual import on
 from textual.app import App, ComposeResult
 from textual.widgets import RadioButton, RadioSet, Static, Footer, Header, Input, Label
 from textual.containers import Horizontal, Grid, Container
 from textual.binding import Binding
 from textual.events import Resize
+from textual.reactive import var
 
 from color_picker.constants import COLOR_SPACES
 from color_picker.widgets import PyfigletText
-from color_picker.help import circle_buffer
+from color_picker.help import circle_buffer, input_formatted_string
 
 
 class ColorPicker(App[None]):
@@ -19,7 +21,7 @@ class ColorPicker(App[None]):
         ),
     ]
 
-    selected_space = "RGB"  # TODO: hardcoded RGB
+    selected_space = var("RGB")
 
     def compose(self) -> ComposeResult:
         yield Header(icon="☰")
@@ -39,13 +41,10 @@ class ColorPicker(App[None]):
 
         # Inputs
         with Horizontal(id="inputs"):
-            current_space = COLOR_SPACES[self.selected_space]
-            for i in range(len(current_space["channels"])):
-                channel = current_space["channels"][i]
-                max_value = current_space["max"][i]
-                unit = current_space["unit"][i]
+            formatted_string = input_formatted_string(self.selected_space)
 
-                yield Input(placeholder=f"{channel} (0 - {max_value}{unit})")
+            for i in range(len(COLOR_SPACES[self.selected_space]["channels"])):
+                yield Input(placeholder=next(formatted_string), id=f"input-{i}")
 
         # Displaying colors in other spaces + aesthetic RGB ASCII image
         with Horizontal(id="bottom-part"):
@@ -54,7 +53,7 @@ class ColorPicker(App[None]):
                     i = circle_buffer()
                     unit = specs["unit"]
 
-                    label = Label(f"0{unit[next(i)]} 0{unit[next(i)]} 0{unit[next(i)]}") # TODO: hardcoded values
+                    label = Label(f"0{unit[next(i)]} 0{unit[next(i)]} 0{unit[next(i)]}")
                     label.border_title = color_space
                     yield label
 
@@ -62,13 +61,22 @@ class ColorPicker(App[None]):
 
         yield Footer()
 
+    @on(RadioSet.Changed)
+    def radioset_changed(self, event: RadioSet.Changed) -> None:
+        self.selected_space = str(event.pressed.label)
+        formatted_string = input_formatted_string(self.selected_space)
+
+        for i in range(len(COLOR_SPACES[self.selected_space]["channels"])):
+            text_input = self.query_one(f"#input-{i}", Input)
+            text_input.placeholder = str(next(formatted_string))
+
     def on_mount(self) -> None:
         self.title = "Color Picker"
         self.sub_title = "Support five different color spaces"
 
     def on_resize(self, event: Resize) -> None:
-        square = self.query_one("Horizontal > #color-container")
-        horizontal = self.query_one("Horizontal")
+        square = self.query_one("Horizontal > #color-container", Container)
+        horizontal = self.query_one("Horizontal", Horizontal)
 
         term_base_width = int(event.size.width * 0.06)
 
