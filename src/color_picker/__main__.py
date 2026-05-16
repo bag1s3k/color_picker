@@ -14,14 +14,16 @@ class ColorPicker(App[None]):
 
     BINDINGS = [
         Binding(key="q", action="quit", description="Quit the app"),
-        Binding(key="?", action="help", description="Show help screen", key_display="?")
+        Binding(
+            key="?", action="help", description="Show help screen", key_display="?"
+        ),
     ]
 
     selected_space = "RGB"  # TODO: hardcoded RGB
 
     def compose(self) -> ComposeResult:
         yield Header(icon="☰")
-        
+
         yield PyfigletText("C o l o r  P i c k e r")
 
         with Horizontal(id="choose-color-space"):
@@ -56,7 +58,7 @@ class ColorPicker(App[None]):
             yield PyfigletText("#ffffff")
 
         yield Footer()
-    
+
     def on_mount(self) -> None:
         self.title = "Color Picker"
         self.sub_title = "Support five different color spaces"
@@ -70,6 +72,6 @@ class ColorPicker(App[None]):
         square.styles.width = term_base_width * 2
         horizontal.styles.height = term_base_width
 
-        
+
 if __name__ == "__main__":
     ColorPicker().run()
