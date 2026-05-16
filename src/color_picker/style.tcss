@@ -4,7 +4,7 @@ PyfigletText {
     color: $primary-lighten-3;
 }
 
-#choose-color-space {
+#top-part {
     width: 1fr;
     align: center middle;
     padding: 0 1;
@@ -12,16 +12,16 @@ PyfigletText {
     min-height: 5;
 }
 
-#choose-color-space > #container-static {
+#top-part > #color-container {
     border: round $primary;
 }
 
-#choose-color-space > #container-static > Static {
+#top-part > #color-container > Static {
     background: white; # TODO: temporarily hardcoded
     height: 1fr;
 }
 
-#choose-color-space > RadioSet {
+#top-part > RadioSet {
     layout: horizontal;
     background: transparent;
     height: 1fr;
@@ -29,33 +29,33 @@ PyfigletText {
     align: center middle;
 }
 
-#choose-color-space > RadioSet > RadioButton {
+#top-part > RadioSet > RadioButton {
     border: round $panel-lighten-2;
 }
 
-#set-numbers {
+#inputs {
     height: auto;
     border: round $primary;
     margin: 0 1;
     width: 1fr;
 }
 
-#set-numbers > Input {
+#inputs > Input {
     width: 1fr;
 }
 
-#set-numbers > Input:focus {
+#inputs > Input:focus {
     border: tall $secondary;
 }
 
-#color-spaces {
+#bottom-part {
     height: 1fr;
     width: 1fr;
     align: center middle;
     min-height: 11;
 }
 
-#color-spaces > Grid {
+#bottom-part > Grid {
     margin: 0 1;
     grid-size: 2 3;
     grid-gutter: 0 2;
@@ -64,13 +64,13 @@ PyfigletText {
     align: center middle;
 }
 
-#color-spaces > PyfigletText {
+#bottom-part > PyfigletText {
     height: 1fr;
     border: round $primary;
     content-align: center middle;
 }
 
-#color-spaces > Grid > Label {
+#bottom-part > Grid > Label {
     border: round $secondary;
     border-title-color: $primary;
     padding: 0 2;

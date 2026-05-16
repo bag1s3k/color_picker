@@ -26,8 +26,9 @@ class ColorPicker(App[None]):
 
         yield PyfigletText("C o l o r  P i c k e r")
 
-        with Horizontal(id="choose-color-space"):
-            with Container(id="container-static"):
+        # Static widget with color + buttons to choose color space
+        with Horizontal(id="top-part"):
+            with Container(id="color-container"):
                 yield Static()
 
             radio_set = RadioSet()
@@ -36,7 +37,8 @@ class ColorPicker(App[None]):
                 for color_space in COLOR_SPACES.keys():
                     yield RadioButton(color_space, value=True)
 
-        with Horizontal(id="set-numbers"):
+        # Inputs
+        with Horizontal(id="inputs"):
             current_space = COLOR_SPACES[self.selected_space]
             for i in range(len(current_space["channels"])):
                 channel = current_space["channels"][i]
@@ -45,13 +47,14 @@ class ColorPicker(App[None]):
 
                 yield Input(placeholder=f"{channel} (0 - {max_value}{unit})")
 
-        with Horizontal(id="color-spaces"):
+        # Displaying colors in other spaces + aesthetic RGB ASCII image
+        with Horizontal(id="bottom-part"):
             with Grid():
                 for color_space, specs in COLOR_SPACES.items():
                     i = circle_buffer()
                     unit = specs["unit"]
 
-                    label = Label(f"0{unit[next(i)]} 0{unit[next(i)]} 0{unit[next(i)]}")
+                    label = Label(f"0{unit[next(i)]} 0{unit[next(i)]} 0{unit[next(i)]}") # TODO: hardcoded values
                     label.border_title = color_space
                     yield label
 
@@ -64,7 +67,7 @@ class ColorPicker(App[None]):
         self.sub_title = "Support five different color spaces"
 
     def on_resize(self, event: Resize) -> None:
-        square = self.query_one("Horizontal > #container-static")
+        square = self.query_one("Horizontal > #color-container")
         horizontal = self.query_one("Horizontal")
 
         term_base_width = int(event.size.width * 0.06)
