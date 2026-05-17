@@ -2,6 +2,7 @@ import pyfiglet
 from textual.widgets import Static, Input, RadioSet, RadioButton, Label
 from textual.containers import Horizontal, Container, Grid
 from textual.app import ComposeResult
+from textual.validation import Number
 
 from color_picker.constants import COLOR_SPACES
 
@@ -19,7 +20,7 @@ class Inputs(Horizontal):
 
     def compose(self) -> ComposeResult:
         for i in range(3):
-            yield Input(id=f"input-{i}")
+            yield Input(id=f"input-{i}", validators=[Number()], valid_empty=True)
 
 
 class SelectColorSpace(Horizontal):

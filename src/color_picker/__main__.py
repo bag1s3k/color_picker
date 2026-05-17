@@ -5,6 +5,7 @@ from textual.containers import Container, Horizontal
 from textual.reactive import reactive
 from textual.binding import Binding
 from textual.events import Resize
+from textual.validation import Number
 
 from color_picker.constants import COLOR_SPACES
 from color_picker.help import input_formatted_string, circle_buffer
@@ -22,7 +23,7 @@ class ColorPicker(App[None]):
     ]
 
     selected_space = reactive("RGB")
-    channels = reactive([0, 0, 0])
+    channels: reactive[list[int | float]] = reactive([0, 0, 0])
 
     def compose(self) -> ComposeResult:
         yield Header(icon="☰")
@@ -37,13 +38,33 @@ class ColorPicker(App[None]):
     @on(RadioSet.Changed)
     def handle_radio_change(self, event: RadioSet.Changed) -> None:
         """Update selected color space"""
+        for i in range(len(COLOR_SPACES[self.selected_space]["channels"])):
+            self.query_one(f"#input-{i}", Input).value = ""
         self.selected_space = str(event.pressed.label)
 
     @on(Input.Changed)
     def handle_input_change(self, event: Input.Changed) -> None:
         """Update channels according to input"""
+        if not (value := event.value):
+            return
+
         i = int(str(event.input.id)[-1])
-        self.channels[i] = int(event.value)
+        current_input = self.query_one(f"#input-{i}", Input)
+        current_input.validators = [
+            Number(minimum=0, maximum=COLOR_SPACES[self.selected_space]["max"][i])
+        ]
+
+        if not current_input.is_valid:
+            return
+
+        try:
+            if value.isdecimal():
+                self.channels[i] = int(value)
+            else:
+                self.channels[i] = float(value)
+        except ValueError:
+            pass
+
         self.mutate_reactive(ColorPicker.channels)
 
     def watch_selected_space(self, old_space: str, new_space: str) -> None:

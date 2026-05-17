@@ -52,7 +52,7 @@ Inputs > Input {
 }
 
 Inputs > Input:focus {
-    border: tall $secondary;
+    # border: tall $secondary;
 }
 
 ColorPreview {
