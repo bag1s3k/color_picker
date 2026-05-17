@@ -1,4 +1,4 @@
-# Dinamically added
+# Dynamically added
 .highlight {
     border: round $primary-lighten-3 !important;
     border-title-color: $primary-lighten-3 !important;
@@ -11,7 +11,7 @@ PyfigletText {
     color: $primary-lighten-3;
 }
 
-#top-part {
+SelectColorSpace {
     width: 1fr;
     align: center middle;
     padding: 0 1;
@@ -19,16 +19,16 @@ PyfigletText {
     min-height: 5;
 }
 
-#top-part > #color-container {
+SelectColorSpace > Container {
     border: round $primary;
 }
 
-#top-part > #color-container > Static {
+SelectColorSpace > Container > Static {
     background: white; # TODO: temporarily hardcoded
     height: 1fr;
 }
 
-#top-part > RadioSet {
+SelectColorSpace > RadioSet {
     layout: horizontal;
     background: transparent;
     height: 1fr;
@@ -36,34 +36,35 @@ PyfigletText {
     align: center middle;
 }
 
-#top-part > RadioSet > RadioButton {
+SelectColorSpace > RadioSet > RadioButton {
     border: round $panel-lighten-2;
 }
 
-#inputs {
+Inputs {
     height: auto;
     border: round $primary;
     margin: 0 1;
     width: 1fr;
 }
 
-#inputs > Input {
+Inputs > Input {
     width: 1fr;
 }
 
-#inputs > Input:focus {
+Inputs > Input:focus {
     border: tall $secondary;
 }
 
-#bottom-part {
+ColorPreview {
     height: 1fr;
     width: 1fr;
     align: center middle;
     min-height: 11;
+    margin: 0 1;
 }
 
-#bottom-part > Grid {
-    margin: 0 1;
+ColorPreview > Grid {
+    margin-right: 1;
     grid-size: 2 3;
     grid-gutter: 0 2;
     width: 1.8fr;
@@ -71,13 +72,13 @@ PyfigletText {
     align: center middle;
 }
 
-#bottom-part > PyfigletText {
+ColorPreview > PyfigletText {
     height: 1fr;
     border: round $primary;
     content-align: center middle;
 }
 
-#bottom-part > Grid > Label {
+ColorPreview > Grid > Label {
     border: round $secondary;
     border-title-color: $primary;
     padding: 0 2;
