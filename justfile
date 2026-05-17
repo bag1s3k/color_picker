@@ -23,6 +23,10 @@ colors:
 
 
 # Ruff commmands
+ruff:
+    just check
+    just format
+
 check fix="":
     uv run ruff check {{ if fix == "--fix" { "--fix" } else { "" } }}
 
