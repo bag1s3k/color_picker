@@ -4,7 +4,7 @@ from textual.widgets import RadioButton, RadioSet, Static, Footer, Header, Input
 from textual.containers import Horizontal, Grid, Container
 from textual.binding import Binding
 from textual.events import Resize
-from textual.reactive import var
+from textual.reactive import reactive
 
 from color_picker.constants import COLOR_SPACES
 from color_picker.widgets import PyfigletText
@@ -21,7 +21,7 @@ class ColorPicker(App[None]):
         ),
     ]
 
-    selected_space = var("RGB")
+    selected_space = reactive("RGB")
 
     def compose(self) -> ComposeResult:
         yield Header(icon="☰")
@@ -53,7 +53,10 @@ class ColorPicker(App[None]):
                     i = circle_buffer()
                     unit = specs["unit"]
 
-                    label = Label(f"0{unit[next(i)]} 0{unit[next(i)]} 0{unit[next(i)]}")
+                    label = Label(
+                        f"0{unit[next(i)]} 0{unit[next(i)]} 0{unit[next(i)]}",
+                        id=f"label-{color_space}",
+                    )
                     label.border_title = color_space
                     yield label
 
@@ -64,15 +67,26 @@ class ColorPicker(App[None]):
     @on(RadioSet.Changed)
     def radioset_changed(self, event: RadioSet.Changed) -> None:
         self.selected_space = str(event.pressed.label)
-        formatted_string = input_formatted_string(self.selected_space)
 
+    def watch_selected_space(self, old_space: str, new_space: str) -> None:
+        try:
+            self.query_one(f"#label-{old_space}", Label).remove_class("highlight")
+            self.query_one(f"#label-{new_space}", Label).add_class("highlight")
+        except Exception:
+            pass
+
+        formatted_string = input_formatted_string(self.selected_space)
         for i in range(len(COLOR_SPACES[self.selected_space]["channels"])):
-            text_input = self.query_one(f"#input-{i}", Input)
-            text_input.placeholder = str(next(formatted_string))
+            try:
+                text_input = self.query_one(f"#input-{i}", Input)
+                text_input.placeholder = str(next(formatted_string))
+            except Exception:
+                pass
 
     def on_mount(self) -> None:
         self.title = "Color Picker"
         self.sub_title = "Support five different color spaces"
+        self.query_one(f"#label-{self.selected_space}", Label).add_class("highlight")
 
     def on_resize(self, event: Resize) -> None:
         square = self.query_one("Horizontal > #color-container", Container)
