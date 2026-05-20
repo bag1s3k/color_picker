@@ -2,6 +2,8 @@ import math
 
 
 class RGB:
+    """A class representing a color in the RGB color space."""
+
     def __init__(self, r: int, g: int, b: int):
         self.r, self.g, self.b = [value / 255 for value in [r, g, b]] # normalize RGB channels (0-1)
 
@@ -10,11 +12,11 @@ class RGB:
         self._delta = self._max - self._min
 
     def _hue(self) -> float:
-        """Calculate Hue in degrees (0.0° - 360.0°)"""
+        """Calculate Hue in degrees (0.0 - 360.0)."""
         if self._delta == 0:
-            return 0
+            return 0.0
 
-        result = 0
+        result = 0.0
         match self._max:
             case self.r:
                 result = ((self.g - self.b) / self._delta) % 6
@@ -27,40 +29,42 @@ class RGB:
         return hue if hue >= 0 else hue + 360.0
 
     def _hsl_lightness(self) -> float:
-        """Calculate lightness in (0.0 - 1.0)"""
+        """Calculate HSL lightness as a coefficient (0.0 - 1.0)."""
         return (self._max + self._min) / 2
 
     def _hsl_saturation(self) -> float:
-        """Calculate HSL saturation in percentage"""
+        """Calculate HSL saturation as a coefficient (0.0 - 1.0)."""
         if self._delta == 0:
             return 0.0
 
         result = 0.0
         if self._hsl_lightness() <= 0.5:
-            return self._delta / (self._max + self._min)
+            result = self._delta / (self._max + self._min)
         else:
-            return self._delta / (2 - self._max - self._min)
+            result = self._delta / (2 - self._max - self._min)
+
+        return result
 
     def _hsv_saturation(self) -> float:
-        """Calculate HSV saturation"""
+        """Calculate HSV saturation as a coefficient (0.0 - 1.0)."""
         if self._max == 0:
             return 0.0
         return self._delta / self._max
 
     def _hsv_value(self) -> float:
-        """Calculate brightness"""
+        """Calculate HSV value (brightness) as a coefficient (0.0 - 1.0)."""
         return self._max
 
     def _hwb_whiteness(self) -> float:
-        """Calculate whiteness"""
+        """Calculate HWB whiteness as a coefficient (0.0 - 1.0)."""
         return self._min
 
     def _hwb_blackness(self) -> float:
-        """Calculate blackness"""
+        """Calculate HWB blackness as a coefficient (0.0 - 1.0)."""
         return 1 - self._max
 
     def hsl(self) -> tuple[float, float, float]:
-        """Convert RGB to HSL (0-360°, 0-100%, 0-100%)"""
+        """Convert RGB to HSL (Hue: 0-360°, Saturation: 0-100%, Lightness: 0-100%)."""
         return (
             round(self._hue(), 1),
             round(self._hsl_saturation() * 100, 1),
@@ -68,7 +72,7 @@ class RGB:
         )
 
     def hsv(self) -> tuple[float, float, float]:
-        """Convert RGB to HSV (0-360°, 0-100%, 0-100%)"""
+        """Convert RGB to HSV (Hue: 0-360°, Saturation: 0-100%, Value: 0-100%)."""
         return (
             round(self._hue(), 1),
             round(self._hsv_saturation() * 100, 1),
@@ -76,7 +80,7 @@ class RGB:
         )
 
     def hwb(self) -> tuple[float, float, float]:
-        """Convert RGB to HWB"""
+        """Convert RGB to HWB (Hue: 0-360°, Whiteness: 0-100%, Blackness: 0-100%)."""
         return (
             round(self._hue(), 1),
             round(self._hwb_whiteness() * 100, 1),
@@ -84,7 +88,7 @@ class RGB:
         )
 
     def oklch(self) -> tuple[float, float, float]:
-        """Convert RGB to OKLCH"""
+        """Convert RGB to OKLCH (Lightness: 0.0-1.0, Chroma: 0.0-0.4+, Hue: 0-360°)."""
         linear_channels = []
         for c in [self.r, self.g, self.b]:
             if c <= 0.04045:
@@ -110,6 +114,6 @@ class RGB:
 
         H = math.degrees(math.atan2(b, a))
         if H < 0:
-            H += 360
+            H += 360.0
 
         return round(L, 3), round(C, 3), round(H, 1)
