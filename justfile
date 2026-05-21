@@ -14,7 +14,7 @@ dev file=main_script:
     uv run textual run --dev {{file}}
 
 
-# Textual commmands
+# Textual commands
 console:
     uv run textual console
 
@@ -22,13 +22,13 @@ colors:
     uv run textual run -c textual colors
 
 
-# Ruff commmands
+# Ruff commands
 ruff:
     just check
     just format
 
-check fix="":
-    uv run ruff check {{ if fix == "--fix" { "--fix" } else { "" } }}
+check +args=".":
+    uv run ruff check {{args}}
 
-format:
-    uv run ruff format
+format +args=".":
+    uv run ruff format {{args}}
