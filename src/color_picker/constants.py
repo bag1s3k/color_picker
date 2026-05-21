@@ -1,9 +1,9 @@
+from string import Template
+from typing import TypedDict
+
+
 COLOR_SPACES = {
-    "RGB": {
-        "channels": ["R", "G", "B"],
-        "max": [255, 255, 255],
-        "unit": ["", "", ""]
-    },
+    "RGB": {"channels": ["R", "G", "B"], "max": [255, 255, 255], "unit": ["", "", ""]},
     "HSL": {
         "channels": ["H", "S", "L"],
         "max": [360, 100, 100],
@@ -19,9 +19,18 @@ COLOR_SPACES = {
         "max": [360, 100, 100],
         "unit": ["°", "%", "%"],
     },
-    "OKLCH": {
-        "channels": ["L", "C", "H"],
-        "max": [1, 0.4, 360],
-        "unit": ["", "", "°"]
-    },
+    "OKLCH": {"channels": ["L", "C", "H"], "max": [1, 0.4, 360], "unit": ["", "", "°"]},
 }
+
+
+class AllowedKeys(TypedDict):
+    """Class which contains allowed arguments for string template"""
+
+    channel_title: str
+    channel_value: float | int
+    max_value: float | int
+    unit: str
+
+
+FORMATTED_INPUT_STR = Template("$channel_title (0 - ${max_value}${unit})")
+FORMATTED_COLOR_PREVIEW = Template("${channel_value}${unit} ")

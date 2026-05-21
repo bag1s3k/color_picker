@@ -5,7 +5,9 @@ class RGB:
     """A class representing a color in the RGB color space."""
 
     def __init__(self, r: int, g: int, b: int):
-        self.r, self.g, self.b = [value / 255 for value in [r, g, b]] # normalize RGB channels (0-1)
+        self.r, self.g, self.b = [
+            value / 255 for value in [r, g, b]
+        ]  # normalize RGB channels (0-1)
 
         self._max = max(self.r, self.g, self.b)
         self._min = min(self.r, self.g, self.b)
@@ -63,12 +65,16 @@ class RGB:
         """Calculate HWB blackness as a coefficient (0.0 - 1.0)."""
         return 1 - self._max
 
+    def rgb(self) -> tuple[int, int, int]:
+        """Return RGB"""
+        return round(self.r * 255), round(self.g * 255), round(self.b * 255)
+
     def hsl(self) -> tuple[float, float, float]:
         """Convert RGB to HSL (Hue: 0-360°, Saturation: 0-100%, Lightness: 0-100%)."""
         return (
             round(self._hue(), 1),
             round(self._hsl_saturation() * 100, 1),
-            round(self._hsl_lightness() * 100, 1)
+            round(self._hsl_lightness() * 100, 1),
         )
 
     def hsv(self) -> tuple[float, float, float]:
@@ -76,7 +82,7 @@ class RGB:
         return (
             round(self._hue(), 1),
             round(self._hsv_saturation() * 100, 1),
-            round(self._hsv_value() * 100, 1)
+            round(self._hsv_value() * 100, 1),
         )
 
     def hwb(self) -> tuple[float, float, float]:
@@ -84,7 +90,7 @@ class RGB:
         return (
             round(self._hue(), 1),
             round(self._hwb_whiteness() * 100, 1),
-            round(self._hwb_blackness() * 100, 1)
+            round(self._hwb_blackness() * 100, 1),
         )
 
     def oklch(self) -> tuple[float, float, float]:
@@ -98,7 +104,7 @@ class RGB:
 
         r_lin, g_lin, b_lin = linear_channels
 
-        l = (0.41222147 * r_lin) + (0.53633253 * g_lin) + (0.05144599 * b_lin)
+        l = (0.41222147 * r_lin) + (0.53633253 * g_lin) + (0.05144599 * b_lin)  # noqa: E741
         m = (0.21190349 * r_lin) + (0.68069954 * g_lin) + (0.10739695 * b_lin)
         s = (0.08830246 * r_lin) + (0.28171883 * g_lin) + (0.62997870 * b_lin)
 
@@ -110,7 +116,7 @@ class RGB:
         a = (1.97799849 * l_) - (2.42859220 * m_) + (0.45059370 * s_)
         b = (0.02590403 * l_) + (0.78277176 * m_) - (0.80867576 * s_)
 
-        C = math.sqrt(a ** 2 + b ** 2)
+        C = math.sqrt(a**2 + b**2)
 
         H = math.degrees(math.atan2(b, a))
         if H < 0:

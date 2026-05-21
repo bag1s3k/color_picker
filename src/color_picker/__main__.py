@@ -6,9 +6,15 @@ from textual.reactive import reactive
 from textual.binding import Binding
 from textual.events import Resize
 from textual.validation import Number
+from textual.css.query import NoMatches
 
-from color_picker.constants import COLOR_SPACES
-from color_picker.help import input_formatted_string, circle_buffer
+from color_picker.constants import (
+    COLOR_SPACES,
+    FORMATTED_INPUT_STR,
+    FORMATTED_COLOR_PREVIEW,
+)
+from color_picker.conversions import RGB
+from color_picker.help import format_string
 from color_picker.widgets import PyfigletText, Inputs, SelectColorSpace, ColorPreview
 
 
@@ -74,11 +80,11 @@ class ColorPicker(App[None]):
 
         try:
             self.query_one(f"#label-{old_space}", Label).remove_class("highlight")
-        except Exception:
+        except NoMatches:
             pass
         self.query_one(f"#label-{new_space}", Label).add_class("highlight")
 
-        formatted_string = input_formatted_string(new_space)
+        formatted_string = format_string(COLOR_SPACES[new_space], FORMATTED_INPUT_STR)
         for i in range(len(COLOR_SPACES[new_space]["channels"])):
             text_input = self.query_one(f"#input-{i}", Input)
             text_input.placeholder = str(next(formatted_string))
@@ -88,16 +94,18 @@ class ColorPicker(App[None]):
         if not self.is_mounted:
             return
 
-        for color_space, specs in COLOR_SPACES.items():
-            i = circle_buffer()
-            unit = specs["unit"]
+        tmp2 = RGB(*new_channels)
 
-            new_text = f"{new_channels[0]}{unit[next(i)]} {new_channels[1]}{unit[next(i)]} {new_channels[2]}{unit[next(i)]}"
+        for color_space, specs in COLOR_SPACES.items():
+            convert_method = getattr(tmp2, color_space.lower())
+
+            tmp = format_string(specs, FORMATTED_COLOR_PREVIEW, convert_method())
+            new_text = "".join(next(tmp) for _ in range(len(self.channels)))
 
             try:
                 label = self.query_one(f"#label-{color_space}", Label)
                 label.update(new_text)
-            except Exception:
+            except NoMatches:
                 pass
 
     def on_mount(self) -> None:
@@ -115,7 +123,7 @@ class ColorPicker(App[None]):
             term_base_width = int(event.size.width * 0.06)
             square.styles.width = term_base_width * 2
             horizontal.styles.height = term_base_width
-        except Exception:
+        except NoMatches:
             pass
 
 
