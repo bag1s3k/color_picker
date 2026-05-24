@@ -3,6 +3,7 @@ from textual.widgets import Static, Input, RadioSet, RadioButton, Label
 from textual.containers import Horizontal, Container, Grid
 from textual.app import ComposeResult
 from textual.validation import Number
+from textual.reactive import reactive
 
 from color_picker.constants import COLOR_SPACES
 
@@ -10,9 +11,15 @@ from color_picker.constants import COLOR_SPACES
 class PyfigletText(Static):
     """Widget, which automatically generate Pyfiglet text without '\n' in the end"""
 
+    text = reactive("#000000")
+
     def __init__(self, text: str, font: str = "standard", **kwargs):
-        rendered_text = pyfiglet.figlet_format(text, font=font).rstrip("\n")
-        super().__init__(rendered_text, **kwargs)
+        super().__init__(**kwargs)
+        self.text = text
+        self.font = font
+
+    def render(self):
+        return pyfiglet.figlet_format(self.text, font=self.font).rstrip("\n")
 
 
 class Inputs(Horizontal):

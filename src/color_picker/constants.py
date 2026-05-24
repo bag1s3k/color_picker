@@ -20,6 +20,7 @@ COLOR_SPACES = {
         "unit": ["°", "%", "%"],
     },
     "OKLCH": {"channels": ["L", "C", "H"], "max": [1, 0.4, 360], "unit": ["", "", "°"]},
+    "HEX": {"channels": ["HEX"], "max": ["FFFFFF"], "unit": [""]},
 }
 
 

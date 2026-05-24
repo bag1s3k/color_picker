@@ -67,7 +67,7 @@ ColorPreview > Grid {
     margin-right: 1;
     grid-size: 2 3;
     grid-gutter: 0 2;
-    width: 1.8fr;
+    width: 1.2fr;
     border: round $primary;
     align: center middle;
 }

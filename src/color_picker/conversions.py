@@ -1,3 +1,8 @@
+# TODO:
+#  - Reverse conversions
+#  - use methods that converts every color space to RGB
+
+
 import math
 
 
@@ -123,3 +128,14 @@ class RGB:
             H += 360.0
 
         return round(L, 3), round(C, 3), round(H, 1)
+
+    def hex(self) -> list[str]:
+        """Convert RGB to HEX
+
+        Returns:
+            list[str]: Wrapped in a list to match the interface of other conversions
+                methods: (rgb, hsl, etc.) for the formatter
+        """
+        return [
+            f"#{round(self.r * 255):02X}{round(self.g * 255):02X}{round(self.b * 255):02X}"
+        ]

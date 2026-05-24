@@ -5,7 +5,7 @@ from textual.containers import Container, Horizontal
 from textual.reactive import reactive
 from textual.binding import Binding
 from textual.events import Resize
-from textual.validation import Number
+from textual.validation import Number, Function
 from textual.css.query import NoMatches
 
 from color_picker.constants import (
@@ -56,9 +56,26 @@ class ColorPicker(App[None]):
 
         i = int(str(event.input.id)[-1])
         current_input = self.query_one(f"#input-{i}", Input)
-        current_input.validators = [
-            Number(minimum=0, maximum=COLOR_SPACES[self.selected_space]["max"][i])
-        ]
+        try:
+            maximum = float(COLOR_SPACES[self.selected_space]["max"][i])
+            current_input.validators = [Number(minimum=0, maximum=maximum)]
+        except ValueError:
+
+            def validate_hex_input(value_: str) -> bool:
+                """Validate HEX input"""
+                if not value_:
+                    return True
+                try:
+                    converted = int(value_, 16)
+                except ValueError:
+                    return False
+
+                max_ = int(COLOR_SPACES[self.selected_space]["max"][i], 16)
+                return converted <= max_
+
+            current_input.validators = [
+                Function(validate_hex_input, "Invalid HEX input")
+            ]
 
         if not current_input.is_valid:
             return
@@ -85,28 +102,49 @@ class ColorPicker(App[None]):
         self.query_one(f"#label-{new_space}", Label).add_class("highlight")
 
         formatted_string = format_string(COLOR_SPACES[new_space], FORMATTED_INPUT_STR)
-        for i in range(len(COLOR_SPACES[new_space]["channels"])):
+        inputs_amount = len(COLOR_SPACES[new_space]["channels"])
+        for i in range(inputs_amount):
             text_input = self.query_one(f"#input-{i}", Input)
+            text_input.styles.display = "block"
             text_input.placeholder = str(next(formatted_string))
 
+        try:
+            if (
+                remaining_inputs_amount := len(COLOR_SPACES[old_space]["channels"])
+                - inputs_amount
+            ) > 0:
+                for i in range(remaining_inputs_amount):
+                    text_input = self.query_one(f"#input-{i + inputs_amount}", Input)
+                    text_input.styles.display = "none"
+        except KeyError:  # old_space doesn't exist on start
+            pass
+
     def watch_channels(self, new_channels: list) -> None:
-        """Update preview Labels according to input"""
+        """Update preview Labels + aesthetic HEX ASCII art according to input"""
         if not self.is_mounted:
             return
 
-        tmp2 = RGB(*new_channels)
+        rgb = RGB(*new_channels) #TODO: REACTIVE???
 
         for color_space, specs in COLOR_SPACES.items():
-            convert_method = getattr(tmp2, color_space.lower())
+            print(color_space)
+            convert_method = getattr(rgb, color_space.lower())
 
-            tmp = format_string(specs, FORMATTED_COLOR_PREVIEW, convert_method())
-            new_text = "".join(next(tmp) for _ in range(len(self.channels)))
+            formatted_string = format_string(
+                specs, FORMATTED_COLOR_PREVIEW, convert_method()
+            )
+            new_text = "".join(
+                next(formatted_string) for _ in range(len(specs["channels"]))
+            )
 
             try:
                 label = self.query_one(f"#label-{color_space}", Label)
                 label.update(new_text)
             except NoMatches:
                 pass
+
+        ascii_art = self.query_one("#hex-ascii", PyfigletText)
+        ascii_art.text = rgb.hex()[0]
 
     def on_mount(self) -> None:
         self.title = "Color Picker"
