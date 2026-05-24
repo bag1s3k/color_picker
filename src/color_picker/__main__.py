@@ -33,7 +33,7 @@ class ColorPicker(App[None]):
 
     def compose(self) -> ComposeResult:
         yield Header(icon="☰")
-        yield PyfigletText("C o l o r  P i c k e r")
+        yield PyfigletText("Color  Picker", font="speed")
 
         yield SelectColorSpace(id="select-space-panel")
         yield Inputs(id="inputs-panel")

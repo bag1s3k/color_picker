@@ -9,7 +9,7 @@ from color_picker.constants import COLOR_SPACES
 
 
 class PyfigletText(Static):
-    """Widget, which automatically generate Pyfiglet text without '\n' in the end"""
+    """Widget, which automatically generate Pyfiglet text without empty line in the end"""
 
     text = reactive("#000000")
 
@@ -19,7 +19,11 @@ class PyfigletText(Static):
         self.font = font
 
     def render(self):
-        return pyfiglet.figlet_format(self.text, font=self.font).rstrip("\n")
+        raw_text = pyfiglet.figlet_format(self.text, font=self.font)
+
+        lines = raw_text.splitlines()
+        return "\n".join(lines[:-1])
+
 
 
 class Inputs(Horizontal):
