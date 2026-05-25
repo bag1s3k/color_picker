@@ -13,7 +13,7 @@ from color_picker.constants import (
     FORMATTED_INPUT_STR,
     FORMATTED_COLOR_PREVIEW,
 )
-from color_picker.conversions import RGB
+from color_picker.conversions import ColorState
 from color_picker.help import format_string
 from color_picker.widgets import PyfigletText, Inputs, SelectColorSpace, ColorPreview
 
@@ -28,8 +28,7 @@ class ColorPicker(App[None]):
         ),
     ]
 
-    selected_space = reactive("RGB")
-    channels: reactive[list[int | float]] = reactive([0, 0, 0])
+    state: reactive[ColorState] = reactive(ColorState(0, 0, 0, "RGB"))
 
     def compose(self) -> ComposeResult:
         yield Header(icon="☰")
@@ -44,9 +43,11 @@ class ColorPicker(App[None]):
     @on(RadioSet.Changed)
     def handle_radio_change(self, event: RadioSet.Changed) -> None:
         """Update selected color space"""
-        for i in range(len(COLOR_SPACES[self.selected_space]["channels"])):
+        for i in range(len(COLOR_SPACES[self.state.selected_space]["channels"])):
             self.query_one(f"#input-{i}", Input).value = ""
-        self.selected_space = str(event.pressed.label)
+        self.state.selected_space = str(event.pressed.label)
+
+        self.mutate_reactive(ColorPicker.state)
 
     @on(Input.Changed)
     def handle_input_change(self, event: Input.Changed) -> None:
@@ -57,7 +58,7 @@ class ColorPicker(App[None]):
         i = int(str(event.input.id)[-1])
         current_input = self.query_one(f"#input-{i}", Input)
         try:
-            maximum = float(COLOR_SPACES[self.selected_space]["max"][i])
+            maximum = float(COLOR_SPACES[self.state.selected_space]["max"][i])
             current_input.validators = [Number(minimum=0, maximum=maximum)]
         except ValueError:
 
@@ -65,12 +66,14 @@ class ColorPicker(App[None]):
                 """Validate HEX input"""
                 if not value_:
                     return True
+                elif len(value_) != 6:
+                    return False
                 try:
                     converted = int(value_, 16)
                 except ValueError:
                     return False
 
-                max_ = int(COLOR_SPACES[self.selected_space]["max"][i], 16)
+                max_ = int(COLOR_SPACES[self.state.selected_space]["max"][i], 16)
                 return converted <= max_
 
             current_input.validators = [
@@ -80,55 +83,60 @@ class ColorPicker(App[None]):
         if not current_input.is_valid:
             return
 
+        new_channels = self.state.channels[:]
+
         try:
             if value.isdecimal():
-                self.channels[i] = int(value)
+                new_channels[i] = int(value)
+            elif self.state.selected_space == "HEX":
+                new_channels[i] = value
             else:
-                self.channels[i] = float(value)
+                new_channels[i] = float(value)
         except ValueError:
             pass
 
-        self.mutate_reactive(ColorPicker.channels)
+        self.state.channels = new_channels
 
-    def watch_selected_space(self, old_space: str, new_space: str) -> None:
-        """Update Input's placeholder and highlight of preview according to selected space"""
+        self.mutate_reactive(ColorPicker.state)
+
+    def watch_state(self) -> None:
+        """Update UI based on current ColorState"""
         if not self.is_mounted:
             return
 
+        new_space = self.state.selected_space
+
+        for space in COLOR_SPACES.keys():
+            try:
+                self.query_one(f"#label-{space}", Label).remove_class("highlight")
+            except NoMatches:
+                pass
+
         try:
-            self.query_one(f"#label-{old_space}", Label).remove_class("highlight")
+            self.query_one(f"#label-{new_space}", Label).add_class("highlight")
         except NoMatches:
             pass
-        self.query_one(f"#label-{new_space}", Label).add_class("highlight")
 
         formatted_string = format_string(COLOR_SPACES[new_space], FORMATTED_INPUT_STR)
         inputs_amount = len(COLOR_SPACES[new_space]["channels"])
+
         for i in range(inputs_amount):
-            text_input = self.query_one(f"#input-{i}", Input)
-            text_input.styles.display = "block"
-            text_input.placeholder = str(next(formatted_string))
+            try:
+                text_input = self.query_one(f"#input-{i}", Input)
+                text_input.styles.display = "block"
+                text_input.placeholder = str(next(formatted_string))
+            except NoMatches:
+                pass
 
-        try:
-            if (
-                remaining_inputs_amount := len(COLOR_SPACES[old_space]["channels"])
-                - inputs_amount
-            ) > 0:
-                for i in range(remaining_inputs_amount):
-                    text_input = self.query_one(f"#input-{i + inputs_amount}", Input)
-                    text_input.styles.display = "none"
-        except KeyError:  # old_space doesn't exist on start
-            pass
-
-    def watch_channels(self, new_channels: list) -> None:
-        """Update preview Labels + aesthetic HEX ASCII art according to input"""
-        if not self.is_mounted:
-            return
-
-        rgb = RGB(*new_channels) #TODO: REACTIVE???
+        for i in range(inputs_amount, 4):
+            try:
+                text_input = self.query_one(f"#input-{i}", Input)
+                text_input.styles.display = "none"
+            except NoMatches:
+                pass
 
         for color_space, specs in COLOR_SPACES.items():
-            print(color_space)
-            convert_method = getattr(rgb, color_space.lower())
+            convert_method = getattr(self.state, color_space.lower())
 
             formatted_string = format_string(
                 specs, FORMATTED_COLOR_PREVIEW, convert_method()
@@ -143,15 +151,18 @@ class ColorPicker(App[None]):
             except NoMatches:
                 pass
 
+        try:
+            ascii_art = self.query_one("#hex-ascii", PyfigletText)
+            ascii_art.text = self.state.hex()[0]
+        except NoMatches:
+            pass
+
         ascii_art = self.query_one("#hex-ascii", PyfigletText)
-        ascii_art.text = rgb.hex()[0]
+        ascii_art.text = self.state.hex()[0]
 
     def on_mount(self) -> None:
         self.title = "Color Picker"
-        self.sub_title = "Support five different color spaces"
-
-        self.watch_selected_space("", self.selected_space)
-        self.watch_channels(self.channels)
+        self.sub_title = "Support six different color spaces"
 
     def on_resize(self, event: Resize) -> None:
         try:

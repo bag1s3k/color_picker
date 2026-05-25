@@ -5,14 +5,36 @@
 
 import math
 
+from color_picker.constants import ColorSpaceType
 
-class RGB:
+
+class ColorState:
     """A class representing a color in the RGB color space."""
 
-    def __init__(self, r: int, g: int, b: int):
+    def __init__(self, r: int, g: int, b: int, selected_space: ColorSpaceType):
         self.r, self.g, self.b = [
-            value / 255 for value in [r, g, b]
-        ]  # normalize RGB channels (0-1)
+            value / 255
+            for value in [r, g, b]  # normalize RGB channels (0-1)
+        ]
+
+        self._max = max(self.r, self.g, self.b)
+        self._min = min(self.r, self.g, self.b)
+        self._delta = self._max - self._min
+
+        self._channels: list[float | int | str] = [r, g, b]
+        self.selected_space = selected_space
+
+    @property
+    def channels(self) -> list[float | int | str]:
+        return self._channels
+
+    @channels.setter
+    def channels(self, new_channels: list[float | int | str]):
+        """Setter # todo:"""
+        self._channels = new_channels
+
+        convert_method = getattr(self, f"from_{self.selected_space.lower()}")
+        convert_method()
 
         self._max = max(self.r, self.g, self.b)
         self._min = min(self.r, self.g, self.b)
@@ -139,3 +161,26 @@ class RGB:
         return [
             f"#{round(self.r * 255):02X}{round(self.g * 255):02X}{round(self.b * 255):02X}"
         ]
+
+    def from_rgb(self):
+        self.r, self.g, self.b = [value / 255 for value in self._channels]
+
+    def from_hsl(self): ...
+
+    def from_hsv(self): ...
+
+    def from_hwb(self): ...
+
+    def from_oklch(self): ...
+
+    def from_hex(self):
+        print("**" * 10, self._channels, "**" * 10)
+        """Convert HEX to RGB"""
+        data = str(self._channels[0])
+
+        if len(data) == 6:
+            self.r, self.g, self.b = [
+                int(f"{data[i - 1]}{data[i]}", 16) / 255
+                for i in range(len(data))
+                if i % 2 != 0
+            ]

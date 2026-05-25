@@ -1,5 +1,5 @@
 from string import Template
-from typing import TypedDict
+from typing import TypedDict, Literal
 
 
 COLOR_SPACES = {
@@ -22,6 +22,8 @@ COLOR_SPACES = {
     "OKLCH": {"channels": ["L", "C", "H"], "max": [1, 0.4, 360], "unit": ["", "", "°"]},
     "HEX": {"channels": ["HEX"], "max": ["FFFFFF"], "unit": [""]},
 }
+
+ColorSpaceType = Literal[*COLOR_SPACES.keys()]
 
 
 class AllowedKeys(TypedDict):
