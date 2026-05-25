@@ -13,7 +13,7 @@ from color_picker.constants import (
     FORMATTED_INPUT_STR,
     FORMATTED_COLOR_PREVIEW,
 )
-from color_picker.conversions import ColorState
+from color_picker.conversions import ColorConverter
 from color_picker.help import format_string
 from color_picker.widgets import PyfigletText, Inputs, SelectColorSpace, ColorPreview
 
@@ -28,7 +28,7 @@ class ColorPicker(App[None]):
         ),
     ]
 
-    state: reactive[ColorState] = reactive(ColorState(0, 0, 0, "RGB"))
+    state: reactive[ColorConverter] = reactive(ColorConverter(0, 0, 0, "RGB"))
 
     def compose(self) -> ComposeResult:
         yield Header(icon="☰")

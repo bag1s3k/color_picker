@@ -1,14 +1,9 @@
-# TODO:
-#  - Reverse conversions
-#  - use methods that converts every color space to RGB
-
-
 import math
 
 from color_picker.constants import ColorSpaceType
 
 
-class ColorState:
+class ColorConverter:
     """A class representing a color in the RGB color space."""
 
     def __init__(self, r: int, g: int, b: int, selected_space: ColorSpaceType):
@@ -162,25 +157,140 @@ class ColorState:
             f"#{round(self.r * 255):02X}{round(self.g * 255):02X}{round(self.b * 255):02X}"
         ]
 
-    def from_rgb(self):
-        self.r, self.g, self.b = [value / 255 for value in self._channels]
+    @staticmethod
+    def _hue_to_rgb_channels(self, h_prime: float, c: float, x: float) -> tuple[float, float, float]:
+        """Helper method to determine temporary RGB channels based on hue sector."""
+        if 0 <= h_prime < 1: return c, x, 0.0
+        if 1 <= h_prime < 2: return x, c, 0.0
+        if 2 <= h_prime < 3: return 0.0, c, x
+        if 3 <= h_prime < 4: return 0.0, x, c
+        if 4 <= h_prime < 5: return x, 0.0, c
+        if 5 <= h_prime <= 6: return c, 0.0, x
+        return 0.0, 0.0, 0.0
 
-    def from_hsl(self): ...
+    def from_rgb(self) -> None:
+        """Convert RGB to normalized RGB channels (0.0 - 1.0)."""
+        self.r, self.g, self.b = (
+            value / 255
+            for value in self._channels
+        )
 
-    def from_hsv(self): ...
+    def from_hsl(self) -> None:
+        """Convert HSL to RGB."""
+        h = float(self._channels[0])
+        s = float(self._channels[1]) / 100
+        l = float(self._channels[2]) / 100
 
-    def from_hwb(self): ...
+        c = (1 - abs((2 * l) - 1)) * s
+        h_prime = h / 60
+        x = c * (1 - abs((h_prime % 2) - 1))
+        m = l - (c / 2)
 
-    def from_oklch(self): ...
+        r1, g1, b1 = self._hue_to_rgb_channels(h_prime, c, x)
 
-    def from_hex(self):
-        print("**" * 10, self._channels, "**" * 10)
-        """Convert HEX to RGB"""
+        self.r = r1 + m
+        self.g = g1 + m
+        self.b = b1 + m
+
+    def from_hsv(self) -> None:
+        """Convert HSV to RGB."""
+        h = float(self._channels[0])
+        s = float(self._channels[1]) / 100
+        v = float(self._channels[2]) / 100
+
+        c = v * s
+        h_prime = h / 60
+        x = c * (1 - abs((h_prime % 2) - 1))
+        m = v - c
+
+        r1, g1, b1 = self._hue_to_rgb_channels(h_prime, c, x)
+
+        self.r = r1 + m
+        self.g = g1 + m
+        self.b = b1 + m
+
+    def from_hwb(self) -> None:
+        """Convert HWB to RGB."""
+        h = float(self._channels[0])
+        w = float(self._channels[1]) / 100
+        b_black = float(self._channels[2]) / 100
+
+        if w + b_black >= 1:
+            gray = w / (w + b_black)
+
+            self.r = gray
+            self.g = gray
+            self.b = gray
+            return
+
+        v = 1 - b_black
+        s = 1 - (w / v) if v > 0 else 0
+
+        c = v * s
+        h_prime = h / 60
+        x = c * (1 - abs((h_prime % 2) - 1))
+        m = v - c
+
+        r1, g1, b1 = self._hue_to_rgb_channels(h_prime, c, x)
+
+        self.r = r1 + m
+        self.g = g1 + m
+        self.b = b1 + m
+
+    def from_oklch(self) -> None:
+        """Convert OKLCH to RGB."""
+        l = float(self._channels[0])
+        c = float(self._channels[1])
+        h_deg = float(self._channels[2])
+
+        h_rad = math.radians(h_deg)
+
+        a = c * math.cos(h_rad)
+        b = c * math.sin(h_rad)
+
+        l_lin = l + (0.3963377774 * a) + (0.2158037573 * b)
+        m_lin = l - (0.1055613458 * a) - (0.0638541728 * b)
+        s_lin = l - (0.0894841775 * a) - (1.2914855480 * b)
+
+        l_cubed = l_lin ** 3
+        m_cubed = m_lin ** 3
+        s_cubed = s_lin ** 3
+
+        r_lin = (
+                (4.0767416621 * l_cubed)
+                - (3.3077115913 * m_cubed)
+                + (0.2309699292 * s_cubed)
+        )
+
+        g_lin = (
+                -(1.2684380046 * l_cubed)
+                + (2.6097574011 * m_cubed)
+                - (0.3413193965 * s_cubed)
+        )
+
+        b_lin = (
+                -(0.0041960863 * l_cubed)
+                - (0.7034186147 * m_cubed)
+                + (1.7076147010 * s_cubed)
+        )
+
+        def to_srgb(channel: float) -> float:
+            if channel <= 0.0031308:
+                result = 12.92 * channel
+            else:
+                result = (1.055 * (max(channel, 0.0) ** (1 / 2.4))) - 0.055
+
+            return max(0.0, min(1.0, result))
+
+        self.r = to_srgb(r_lin)
+        self.g = to_srgb(g_lin)
+        self.b = to_srgb(b_lin)
+
+    def from_hex(self) -> None:
+        """Convert HEX to RGB."""
         data = str(self._channels[0])
 
-        if len(data) == 6:
-            self.r, self.g, self.b = [
-                int(f"{data[i - 1]}{data[i]}", 16) / 255
-                for i in range(len(data))
-                if i % 2 != 0
-            ]
+        self.r, self.g, self.b = (
+            int(data[i: i + 2], 16) / 255
+            for i in range(0, 6, 2)
+        )
