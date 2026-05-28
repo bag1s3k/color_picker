@@ -158,7 +158,7 @@ class ColorConverter:
         ]
 
     @staticmethod
-    def _hue_to_rgb_channels(self, h_prime: float, c: float, x: float) -> tuple[float, float, float]:
+    def _hue_to_rgb_channels(h_prime: float, c: float, x: float) -> tuple[float, float, float]:
         """Helper method to determine temporary RGB channels based on hue sector."""
         if 0 <= h_prime < 1: return c, x, 0.0
         if 1 <= h_prime < 2: return x, c, 0.0
