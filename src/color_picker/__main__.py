@@ -1,12 +1,14 @@
 from textual import on
 from textual.app import App, ComposeResult
-from textual.widgets import Input, RadioSet, Label, Header, Footer, Static
+from textual.widgets import Input, RadioSet, Label, Header, Footer, Static, Button
 from textual.containers import Container, Horizontal
 from textual.reactive import reactive
 from textual.binding import Binding
 from textual.events import Resize
 from textual.validation import Number, Function
 from textual.css.query import NoMatches
+import mss
+from pynput import mouse
 
 from color_picker.constants import (
     COLOR_SPACES,
@@ -48,6 +50,46 @@ class ColorPicker(App[None]):
         self.state.selected_space = str(event.pressed.label)
 
         self.mutate_reactive(ColorPicker.state)
+
+    @on(Button.Pressed)
+    def handle_button_change(self):
+        """Start 'color picker' tool in single thread"""
+        self.run_worker(self.start_color_picker, thread=True)
+
+    def set_color(self, channels: list[int]):
+        """Update reactive color attribute"""
+        self.state.selected_space = "RGB"
+        self.state.channels = channels
+
+        self.mutate_reactive(ColorPicker.state)
+
+    def start_color_picker(self):
+        """Start actual tool 'color picker'"""
+        with mss.MSS() as screen:
+
+            def pick_color(x: int, y: int) -> list:
+                """Return picked RGB"""
+                bbox = (x, y, x + 1, y + 1)
+                rgb = screen.grab(bbox).rgb
+                return [int(i) for i in rgb]
+
+            def on_click(x, y):
+                """Follow mouse position and cancel tool on click"""
+                if not self.is_running:
+                    return False
+
+                self.call_from_thread(self.set_color, pick_color(int(x), int(y)))
+                return False
+
+            def on_move(x, y):
+                """Follow mouse position"""
+                if not self.is_running:
+                    return False
+
+                self.call_from_thread(self.set_color, pick_color(int(x), int(y)))
+
+            with mouse.Listener(on_click=on_click, on_move=on_move) as listener:
+                listener.join()
 
     @on(Input.Changed)
     def handle_input_change(self, event: Input.Changed) -> None:

@@ -1,5 +1,5 @@
 import pyfiglet
-from textual.widgets import Static, Input, RadioSet, RadioButton, Label
+from textual.widgets import Static, Input, RadioSet, RadioButton, Label, Button
 from textual.containers import Horizontal, Container, Grid
 from textual.app import ComposeResult
 from textual.validation import Number
@@ -33,7 +33,7 @@ class Inputs(Horizontal):
         for i in range(3):
             yield Input(id=f"input-{i}", validators=[Number()], valid_empty=True)
 
-
+        yield Button("✎  Pick")
 class SelectColorSpace(Horizontal):
     """Represents Horizontal widget with RadioSet + square with color"""
 
