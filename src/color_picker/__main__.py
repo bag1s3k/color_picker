@@ -1,6 +1,6 @@
 from textual import on
 from textual.app import App, ComposeResult
-from textual.widgets import Input, RadioSet, Label, Header, Footer
+from textual.widgets import Input, RadioSet, Label, Header, Footer, Static
 from textual.containers import Container, Horizontal
 from textual.reactive import reactive
 from textual.binding import Binding
@@ -159,6 +159,9 @@ class ColorPicker(App[None]):
 
         ascii_art = self.query_one("#hex-ascii", PyfigletText)
         ascii_art.text = self.state.hex()[0]
+
+        color_box = self.query_one("#color-container > Static", Static)
+        color_box.styles.background = self.state.hex()[0]
 
     def on_mount(self) -> None:
         self.title = "Color Picker"
