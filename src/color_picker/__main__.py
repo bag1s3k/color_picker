@@ -54,6 +54,7 @@ class ColorPicker(App[None]):
     @on(Button.Pressed)
     def handle_button_change(self):
         """Start 'color picker' tool in single thread"""
+        self.query_one("Inputs > Button", Button).variant = "primary"
         self.run_worker(self.start_color_picker, thread=True)
 
     def set_color(self, channels: list[int]):
@@ -84,6 +85,7 @@ class ColorPicker(App[None]):
 
                 self.notify(f"rgb({r}, {b}, {g})", title="Color has been picked",
                             severity="information")
+                self.query_one("Inputs > Button", Button).variant = "default"
                 return False
 
             def on_move(x, y):
