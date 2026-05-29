@@ -78,7 +78,12 @@ class ColorPicker(App[None]):
                 if not self.is_running:
                     return False
 
-                self.call_from_thread(self.set_color, pick_color(int(x), int(y)))
+                r, g, b = pick_color(int(x), int(y))
+
+                self.call_from_thread(self.set_color, [r, g, b])
+
+                self.notify(f"rgb({r}, {b}, {g})", title="Color has been picked",
+                            severity="information")
                 return False
 
             def on_move(x, y):
