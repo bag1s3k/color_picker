@@ -25,7 +25,7 @@
 
 - Color Conversions
 - Global Eyedropper
-- Built-in `textual` features (Themes, keyboard shortcuts, console, ...)
+- Built-in `textual` features (Themes, keyboard shortcuts, console, etc.)
 
 ### Available Color Spaces
 
@@ -129,7 +129,7 @@
 First, clone the repository and navigate to the project folder:
 
 ```bash
-git clone [https://github.com/bag1s3k/color_picker.git](https://github.com/bag1s3k/color_picker.git)
+git clone https://github.com/bag1s3k/color_picker.git
 cd color_picker
 ```
 
@@ -161,6 +161,7 @@ If you don't use `just`, you can use equivalent commands directly through `uv`:
 - `uv run -m src.color_picker` – Standard run of the app.
 - `uv run textual run --dev .\src\color_picker\__main__.py` – Runs the app in development mode.
 - `uv run textual console` – Opens the Textual developer console.
+- `uv run textual serve .\src\color_picker\__main__.py` - Runs the app on localhost e.g. `http://localhost:8000`
 
 ### Alternative: Running with standard Python
 
@@ -179,3 +180,4 @@ If you prefer to use standard Python commands inside your activated virtual envi
 - Responsive layout
 - Copy buttons
 - Shortcuts
+- Config file (default settings, history, etc.)
