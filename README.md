@@ -4,7 +4,7 @@
 
 # Color Picker
 
-**Color Picker** is a Python `TUI` (Text User Interface) application. Key features include **conversions between color spaces** and an **actual global color picker**.
+**Color Picker** is a Python `TUI` (Terminal User Interface) application. Key features include **conversions between color spaces** and an **actual global color picker**.
 
 > [!NOTE] 
 > The reason why I built this is my love for working in the **command prompt**. 
