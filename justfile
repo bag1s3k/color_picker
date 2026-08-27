@@ -1,14 +1,11 @@
-set shell := ["powershell"]
-
 @default:
     just --list
 
-package_name := "color_picker"
-main_modul := "src.color_picker"
-main_script := "src/color_picker/__main__.py"
+package_name := "color-picker"
+main_script := "src/color_picker/__init__.py"
 
-run file=main_modul:
-    uv run -m {{file}}
+run file=package_name:
+    uv run {{file}}
 
 dev file=main_script:
     uv run textual run --dev {{file}}
