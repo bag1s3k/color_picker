@@ -290,6 +290,8 @@ class ColorConverter:
         """Convert HEX to RGB."""
         data = str(self._channels[0])
 
+        data = data.ljust(6, "0")
+
         self.r, self.g, self.b = (
             int(data[i: i + 2], 16) / 255
             for i in range(0, 6, 2)
