@@ -6,15 +6,16 @@
 
 **Color Picker** is a Python `TUI` (Terminal User Interface) application. Key features include **conversions between color spaces** and an **actual global color picker**.
 
-> [!NOTE] 
-> The reason why I built this is my love for working in the **command prompt**. 
+> [!NOTE]  
 > Once I discovered that something like a `TUI` exists, I had to try building one myself.
+> So this project is mainly to learn.
 
 > [!WARNING]
 > **Important Note for Linux Users:**
 > If you are running this application on Linux, please make sure you are using the **X11 (Xorg)** display server. To use the global color picker, you need to log into an X11/Xorg session instead of Wayland. The application uses the `pynput` library to track mouse movement and clicks globally (even outside the terminal), which Wayland blocks for security reasons.
 
 ## Table of Contents
+
 - [Features](#features)
   - [Available Color Spaces](#available-color-spaces)
 - [Installation](#installation)
@@ -168,8 +169,8 @@ If you don't use `just`, you can use equivalent commands directly through `uv`:
 If you prefer to use standard Python commands inside your activated virtual environment (`.venv`), you can use:
 
 1. Activate python virtual environment
-    - `.\.venv\Scripts\activate` - on Windows
-    - `source ./bin/activate` - on Linux/macOS
+   - `.\.venv\Scripts\activate` - on Windows
+   - `source ./bin/activate` - on Linux/macOS
 
 - `python -m src.color_picker` – Standard run of the app.
 - `textual run --dev src/color_picker/__main__.py` – Runs the app in development mode (requires `textual` installed globally or in your environment).
